@@ -14,7 +14,4 @@ public class CacheConfig {
 
 	public static final String PORT_SERVER3 = "11213";
 
-	// TODO: enable
-	// public static final String PORT_P = "to be defined";
-
 }
