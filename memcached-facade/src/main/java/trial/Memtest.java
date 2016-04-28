@@ -7,6 +7,7 @@ import net.spy.memcached.MemcachedClient;
 
 public class Memtest {
 
+	// TODO: test in unittest auslagern
 	public static void main(final String[] args) {
 
 		MemcachedClient c;
