@@ -22,7 +22,7 @@ public class MemcachedTest {
 		try {
 			client = new MemcachedClient(new InetSocketAddress("localhost", 11211));
 		} catch (final IOException e) {
-			fail(e.getMessage());
+			fail("Exception thrown: " + e.getMessage());
 		}
 	}
 
@@ -32,7 +32,7 @@ public class MemcachedTest {
 		try {
 			Assert.assertTrue(future.get());
 		} catch (InterruptedException | ExecutionException e) {
-			fail();
+			fail("Exception thrown: " + e.getMessage());
 		}
 	}
 
