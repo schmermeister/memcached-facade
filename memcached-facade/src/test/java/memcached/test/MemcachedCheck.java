@@ -13,7 +13,7 @@ import org.junit.Test;
 import net.spy.memcached.MemcachedClient;
 import net.spy.memcached.internal.OperationFuture;
 
-public class MemcachedTest {
+public class MemcachedCheck {
 
 	private MemcachedClient client;
 
