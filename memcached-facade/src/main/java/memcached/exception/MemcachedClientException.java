@@ -1,7 +1,7 @@
 package memcached.exception;
 
 /**
- * @author schmer
+ * @author André Schmer
  *
  */
 public class MemcachedClientException extends Exception {

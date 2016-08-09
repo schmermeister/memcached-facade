@@ -1,7 +1,7 @@
 package memcached.facade;
 
 /**
- * @author schmer
+ * @author André Schmer
  *
  */
 public class CacheConfig {

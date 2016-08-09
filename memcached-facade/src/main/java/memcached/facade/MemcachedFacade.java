@@ -21,7 +21,7 @@ import net.spy.memcached.internal.OperationFuture;
  * Facade for memcached. Useful for storing, receiving and removing data from
  * memcached.
  * 
- * @author schmer
+ * @author André Schmer
  * 
  */
 public class MemcachedFacade {
