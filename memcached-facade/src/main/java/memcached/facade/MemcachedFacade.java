@@ -61,8 +61,8 @@ public class MemcachedFacade {
 	public void registerClient(final String host, final String port) throws MemcachedClientException {
 		setUp(host);
 		try {
-			client = new MemcachedClient(builder.setFailureMode(FailureMode.Retry).build(),
-					AddrUtil.getAddresses("localhost" + ":" + port));
+			client = new MemcachedClient(builder.setFailureMode(FailureMode.Retry).build(), AddrUtil.getAddresses(
+					"localhost" + ":" + port));
 		} catch (final IOException e) {
 			throw new MemcachedClientException("Unable to create new cache client, cause " + e.getMessage());
 		}
@@ -99,8 +99,8 @@ public class MemcachedFacade {
 	 *            the data to store
 	 * @param exp
 	 *            expiration time for data in seconds
-	 * @return <code>Boolean.TRUE</code> if a future is responding,
-	 *         <code>Boolean.FALSE</code> otherwise.
+	 * @return {@code Boolean.TRUE} if a future is responding,
+	 *         {@code Boolean.FALSE} otherwise.
 	 */
 	public Boolean setDataTo(final String key, final Object data, final int exp) {
 		try {
@@ -112,11 +112,12 @@ public class MemcachedFacade {
 	}
 
 	/**
-	 * Sets data with key in cache with expiration of {@value #EXP_P} seconds,
-	 * regardless of any existing value. Neither key nor data may be null.
+	 * Sets {@code data} with {@code key} in cache with expiration of {@value #EXP_P} seconds,
+	 * regardless of any existing value. Neither {@code key} nor {@code data} may be null.
 	 * 
 	 * @param key
 	 * @param data
+	 * @return Boolean
 	 */
 	public Boolean setDataTo(final String key, final Object data) {
 		try {
@@ -131,13 +132,13 @@ public class MemcachedFacade {
 	/**
 	 * Get the data from the cache. Uses the asynchronous approach with a
 	 * timeout delay of {@value #ASYNC_TIMEOUT} ms. In case of the cache does
-	 * not responding, <code>null</code> value will be returned.
+	 * not responding, {@code null} value will be returned.
 	 * 
 	 * @param key
 	 *            for the data value.
 	 * @param clazz
 	 *            , the expected type of the data value.
-	 * @return the data with the type of <code>clazz</code>
+	 * @return the data with the type of {@code clazz}
 	 */
 	public <T> T getDataFrom(final String key, final Class<T> clazz) {
 		final Future<Object> f = client.asyncGet(key);
@@ -155,13 +156,13 @@ public class MemcachedFacade {
 	/**
 	 * Get the data from the cache. Uses the asynchronous approach with a
 	 * timeout delay of {@value #ASYNC_TIMEOUT} ms. In case of the cache does
-	 * not responding, <code>null</code> value will be returned.
+	 * not responding, {@code null} value will be returned.
 	 * 
 	 * @param key
 	 *            for the data value.
 	 * @param clazz
 	 *            , the expected type of the data value.
-	 * @return the data with the type of <code>clazz</code>
+	 * @return the data with the type of {@code clazz}
 	 */
 	public Object getDataFrom(final String key) {
 		final Future<Object> f = client.asyncGet(key);
