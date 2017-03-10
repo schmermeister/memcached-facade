@@ -50,19 +50,27 @@ public class MemcachedFacade {
 
 	private MemcachedClient client;
 
-	private void setUp(final String host) {
+	/**
+	 * 
+	 * @param host
+	 * @param port
+	 */
+	public MemcachedFacade(final String host, final String port) {
+		try {
+			registerClient(host, port);
+		} catch (final MemcachedClientException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void registerClient(final String host, final String port) throws MemcachedClientException {
 		builder = new ConnectionFactoryBuilder();
 		if (false == "127.0.0.1".equals(host)) {
 			builder = builder.setProtocol(ConnectionFactoryBuilder.Protocol.BINARY);
 		}
 		builder = builder.setOpQueueMaxBlockTime(500);
-	}
-
-	public void registerClient(final String host, final String port) throws MemcachedClientException {
-		setUp(host);
 		try {
-			client = new MemcachedClient(builder.setFailureMode(FailureMode.Retry).build(), AddrUtil.getAddresses(
-					"localhost" + ":" + port));
+			client = new MemcachedClient(builder.setFailureMode(FailureMode.Retry).build(), AddrUtil.getAddresses("localhost" + ":" + port));
 		} catch (final IOException e) {
 			throw new MemcachedClientException("Unable to create new cache client, cause " + e.getMessage());
 		}
@@ -76,7 +84,7 @@ public class MemcachedFacade {
 	}
 
 	/**
-	 * Removes the cache data with corresponding key.
+	 * Removes the cache data with corresponding {@code key}.
 	 *
 	 * @param key
 	 */
@@ -90,8 +98,9 @@ public class MemcachedFacade {
 	}
 
 	/**
-	 * Sets data with key in cache. Neither key nor data may be null. In this
-	 * case a NullPointerException will be thrown {@link NullPointerException}.
+	 * Sets {@code data} with {@code key} in cache. Neither {@code key} nor
+	 * {@code data} may be null. In this case a NullPointerException will be
+	 * thrown {@link NullPointerException}.
 	 * 
 	 * @param key
 	 *            the key under which data is stored.
@@ -112,12 +121,16 @@ public class MemcachedFacade {
 	}
 
 	/**
-	 * Sets {@code data} with {@code key} in cache with expiration of {@value #EXP_P} seconds,
-	 * regardless of any existing value. Neither {@code key} nor {@code data} may be null.
+	 * Sets {@code data} with {@code key} in cache with expiration of
+	 * {@value #EXP_P} seconds, regardless of any existing value. Neither
+	 * {@code key} nor {@code data} may be null.
 	 * 
 	 * @param key
+	 *            the key under which data is stored.
 	 * @param data
-	 * @return Boolean
+	 *            the data to store
+	 * @return {@code Boolean.TRUE} if a future is responding,
+	 *         {@code Boolean.FALSE} otherwise.
 	 */
 	public Boolean setDataTo(final String key, final Object data) {
 		try {
@@ -130,9 +143,9 @@ public class MemcachedFacade {
 	}
 
 	/**
-	 * Get the data from the cache. Uses the asynchronous approach with a
-	 * timeout delay of {@value #ASYNC_TIMEOUT} ms. In case of the cache does
-	 * not responding, {@code null} value will be returned.
+	 * Get the {@code data} from the cache. Uses the asynchronous approach with
+	 * a timeout delay of {@value #ASYNC_TIMEOUT} ms. In case of the cache does
+	 * not responding, {@code null} will be returned.
 	 * 
 	 * @param key
 	 *            for the data value.
@@ -154,9 +167,9 @@ public class MemcachedFacade {
 	}
 
 	/**
-	 * Get the data from the cache. Uses the asynchronous approach with a
-	 * timeout delay of {@value #ASYNC_TIMEOUT} ms. In case of the cache does
-	 * not responding, {@code null} value will be returned.
+	 * Get the {@code data} from the cache. Uses the asynchronous approach with
+	 * a timeout delay of {@value #ASYNC_TIMEOUT} ms. In case of the cache does
+	 * not responding, {@code null} will be returned.
 	 * 
 	 * @param key
 	 *            for the data value.
@@ -175,10 +188,6 @@ public class MemcachedFacade {
 		}
 		return null;
 	}
-
-	// public MemcachedClient getClient() {
-	// return client;
-	// }
 
 	public Map<SocketAddress, Map<String, String>> getStats() {
 		return client.getStats();
