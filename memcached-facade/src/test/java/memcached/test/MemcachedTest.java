@@ -13,7 +13,7 @@ import org.junit.Test;
 import net.spy.memcached.MemcachedClient;
 import net.spy.memcached.internal.OperationFuture;
 
-public class MemcachedCheck {
+public class MemcachedTest {
 
 	private MemcachedClient client;
 
@@ -27,19 +27,15 @@ public class MemcachedCheck {
 	}
 
 	@Test
-	public void write() {
+	public void readwrite() {
 		final OperationFuture<Boolean> future = client.set("someKey", 3600, "someValue");
 		try {
 			Assert.assertTrue(future.get());
+			final String testobject = (String) client.get("someKey");
+			Assert.assertEquals(testobject, "someValue");
 		} catch (InterruptedException | ExecutionException e) {
 			fail("Exception thrown: " + e.getMessage());
 		}
-	}
-
-	@Test
-	public void read() {
-		final String testobject = (String) client.get("someKey");
-		Assert.assertEquals(testobject, "someValue");
 	}
 
 }
