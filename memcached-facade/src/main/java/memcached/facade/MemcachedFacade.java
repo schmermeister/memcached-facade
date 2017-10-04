@@ -2,6 +2,8 @@ package memcached.facade;
 
 import java.io.IOException;
 import java.net.SocketAddress;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -12,14 +14,12 @@ import com.google.common.primitives.Primitives;
 
 import memcached.exception.MemcachedClientException;
 import net.spy.memcached.AddrUtil;
-import net.spy.memcached.ConnectionFactoryBuilder;
-import net.spy.memcached.FailureMode;
+import net.spy.memcached.BinaryConnectionFactory;
 import net.spy.memcached.MemcachedClient;
 import net.spy.memcached.internal.OperationFuture;
 
 /**
- * Facade for memcached. Useful for storing, receiving and removing data from
- * memcached.
+ * Facade for memcached. Useful for storing, receiving and removing data from memcached.
  * 
  * @author André Schmer
  * 
@@ -46,7 +46,7 @@ public class MemcachedFacade {
 	 */
 	private static final int ASYNC_TIMEOUT = 50;
 
-	private ConnectionFactoryBuilder builder;
+	// private ConnectionFactoryBuilder builder;
 
 	private MemcachedClient client;
 
@@ -57,20 +57,30 @@ public class MemcachedFacade {
 	 */
 	public MemcachedFacade(final String host, final String port) {
 		try {
-			registerClient(host, port);
+			final List<String> server = new ArrayList<>();
+			server.add(host + ":" + port);
+			registerClient(server);
 		} catch (final MemcachedClientException e) {
 			e.printStackTrace();
 		}
 	}
 
-	private void registerClient(final String host, final String port) throws MemcachedClientException {
-		builder = new ConnectionFactoryBuilder();
-		if (false == "127.0.0.1".equals(host)) {
-			builder = builder.setProtocol(ConnectionFactoryBuilder.Protocol.BINARY);
-		}
-		builder = builder.setOpQueueMaxBlockTime(500);
+	public MemcachedFacade(final List<String> serverList) {
 		try {
-			client = new MemcachedClient(builder.setFailureMode(FailureMode.Retry).build(), AddrUtil.getAddresses("localhost" + ":" + port));
+			registerClient(serverList);
+		} catch (final MemcachedClientException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void registerClient(final List<String> serverList) throws MemcachedClientException {
+		// builder = new ConnectionFactoryBuilder();
+		// if (false == "127.0.0.1".equals(host)) {
+		// builder = builder.setProtocol(ConnectionFactoryBuilder.Protocol.BINARY);
+		// }
+		// builder = builder.setOpQueueMaxBlockTime(500).setFailureMode(FailureMode.Retry);
+		try {
+			client = new MemcachedClient(new BinaryConnectionFactory(), AddrUtil.getAddresses(serverList));
 		} catch (final IOException e) {
 			throw new MemcachedClientException("Unable to create new cache client, cause " + e.getMessage());
 		}
@@ -98,9 +108,8 @@ public class MemcachedFacade {
 	}
 
 	/**
-	 * Sets {@code data} with {@code key} in cache. Neither {@code key} nor
-	 * {@code data} may be null. In this case a NullPointerException will be
-	 * thrown {@link NullPointerException}.
+	 * Sets {@code data} with {@code key} in cache. Neither {@code key} nor {@code data} may be null. In this case a NullPointerException will be thrown
+	 * {@link NullPointerException}.
 	 * 
 	 * @param key
 	 *            the key under which data is stored.
@@ -108,8 +117,7 @@ public class MemcachedFacade {
 	 *            the data to store
 	 * @param exp
 	 *            expiration time for data in seconds
-	 * @return {@code Boolean.TRUE} if a future is responding,
-	 *         {@code Boolean.FALSE} otherwise.
+	 * @return {@code Boolean.TRUE} if a future is responding, {@code Boolean.FALSE} otherwise.
 	 */
 	public Boolean setDataTo(final String key, final Object data, final int exp) {
 		try {
@@ -121,21 +129,20 @@ public class MemcachedFacade {
 	}
 
 	/**
-	 * Sets {@code data} with {@code key} in cache with expiration of
-	 * {@value #EXP_P} seconds, regardless of any existing value. Neither
-	 * {@code key} nor {@code data} may be null.
+	 * Sets {@code data} with {@code key} in cache with expiration of {@value #EXP_P} seconds, regardless of any existing value. Neither {@code key} nor
+	 * {@code data} may be null.
 	 * 
 	 * @param key
 	 *            the key under which data is stored.
 	 * @param data
 	 *            the data to store
-	 * @return {@code Boolean.TRUE} if a future is responding,
-	 *         {@code Boolean.FALSE} otherwise.
+	 * @return {@code Boolean.TRUE} if a future is responding, {@code Boolean.FALSE} otherwise.
 	 */
 	public Boolean setDataTo(final String key, final Object data) {
 		try {
 			final OperationFuture<Boolean> future = client.set(key, EXP_P, data);
-			return future.get();
+			// final OperationFuture<Boolean> flushed = client.flush();
+			return future.get();// && flushed.get();
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 		}
@@ -143,9 +150,8 @@ public class MemcachedFacade {
 	}
 
 	/**
-	 * Get the {@code data} from the cache. Uses the asynchronous approach with
-	 * a timeout delay of {@value #ASYNC_TIMEOUT} ms. In case of the cache does
-	 * not responding, {@code null} will be returned.
+	 * Get the {@code data} from the cache. Uses the asynchronous approach with a timeout delay of {@value #ASYNC_TIMEOUT} ms. In case of the cache does not
+	 * responding, {@code null} will be returned.
 	 * 
 	 * @param key
 	 *            for the data value.
@@ -167,9 +173,8 @@ public class MemcachedFacade {
 	}
 
 	/**
-	 * Get the {@code data} from the cache. Uses the asynchronous approach with
-	 * a timeout delay of {@value #ASYNC_TIMEOUT} ms. In case of the cache does
-	 * not responding, {@code null} will be returned.
+	 * Get the {@code data} from the cache. Uses the asynchronous approach with a timeout delay of {@value #ASYNC_TIMEOUT} ms. In case of the cache does not
+	 * responding, {@code null} will be returned.
 	 * 
 	 * @param key
 	 *            for the data value.
