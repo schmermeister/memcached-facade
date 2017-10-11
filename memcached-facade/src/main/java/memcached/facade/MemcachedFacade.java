@@ -14,7 +14,8 @@ import com.google.common.primitives.Primitives;
 
 import memcached.exception.MemcachedClientException;
 import net.spy.memcached.AddrUtil;
-import net.spy.memcached.BinaryConnectionFactory;
+import net.spy.memcached.ConnectionFactoryBuilder;
+import net.spy.memcached.FailureMode;
 import net.spy.memcached.MemcachedClient;
 import net.spy.memcached.internal.OperationFuture;
 
@@ -46,7 +47,7 @@ public class MemcachedFacade {
 	 */
 	private static final int ASYNC_TIMEOUT = 50;
 
-	// private ConnectionFactoryBuilder builder;
+	private ConnectionFactoryBuilder builder;
 
 	private MemcachedClient client;
 
@@ -74,13 +75,21 @@ public class MemcachedFacade {
 	}
 
 	private void registerClient(final List<String> serverList) throws MemcachedClientException {
-		// builder = new ConnectionFactoryBuilder();
-		// if (false == "127.0.0.1".equals(host)) {
-		// builder = builder.setProtocol(ConnectionFactoryBuilder.Protocol.BINARY);
+		// try {
+		// final MemcachedConnection mconn = new BinaryConnectionFactory().createConnection(AddrUtil.getAddresses(serverList));
+		// final MemcachedNode node = new BinaryConnectionFactory().createMemcachedNode(null, null, 0);
+		// } catch (final IOException e1) {
+		// e1.printStackTrace();
 		// }
-		// builder = builder.setOpQueueMaxBlockTime(500).setFailureMode(FailureMode.Retry);
+
+		builder = new ConnectionFactoryBuilder();
+		// if (false == "127.0.0.1".equals(host)) {
+		builder = builder.setProtocol(ConnectionFactoryBuilder.Protocol.BINARY);
+		// }
+		builder = builder.setOpQueueMaxBlockTime(500).setFailureMode(FailureMode.Retry);
 		try {
-			client = new MemcachedClient(new BinaryConnectionFactory(), AddrUtil.getAddresses(serverList));
+			// client = new MemcachedClient(new BinaryConnectionFactory(), AddrUtil.getAddresses(serverList));
+			client = new MemcachedClient(builder.build(), AddrUtil.getAddresses(serverList));
 		} catch (final IOException e) {
 			throw new MemcachedClientException("Unable to create new cache client, cause " + e.getMessage());
 		}
